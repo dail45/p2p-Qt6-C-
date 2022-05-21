@@ -1,0 +1,90 @@
+QWidget {
+    background-color: #E9E9E9;
+    color: #444444;
+    border-color: #AAAAAA;
+    border-radius: 10px;
+}
+::tab {
+    background: rgb(255, 255, 255);
+    color: black;
+}
+::tab:selected {
+    background-color: rgb(205, 205, 205);
+    color: #444444;
+}
+QTabWidget::pane {
+    border: 0px;
+}
+QTabWidget::tab-bar {
+    color: red;
+    background-color: red;
+}
+QPushButton {
+    background-color: #AAAAAA;
+    color: #000000;
+    border-radius: 8px;
+}
+QPushButton::hover {
+    background-color: #CCCCCC;
+    border: 1px solid #444444;
+}
+QPushButton::disabled {
+    color: #808080;
+    background-color: #CCCCCC;
+}
+QPushButton::pressed {
+    background-color: #DCDCDC;
+}
+QCheckBox::indicator {
+    border: 1px solid #AAAAAA;
+    background-color: #FFFFFF;
+    border-radius: 3px;
+}
+QCheckBox::indicator:checked {
+    background-color: #0b76ef;
+}
+QLineEdit {
+    border: 1px solid #AAAAAA;
+    min-height: 20px;
+}
+QTextEdit {
+    border: 1px solid #AAAAAA;
+}
+QComboBox {
+    border: 1px solid #AAAAAA;
+    min-height: 20px;
+}
+QFontComboBox {
+    border: 1px solid #AAAAAA;
+}
+QProgressBar {
+    color: #505050;
+    border: 1px solid #AAAAAA;
+    text-align: center;
+    height: 16px;
+    border-radius: 8px;
+}
+QProgressBar::chunk {
+    background-color: #05B8CC;
+    border-radius: 8px;
+}
+QComboBox::drop-down {
+    border-top-right-radius: 1px;
+    border-bottom-right-radius: 1px;
+}
+QSpinBox {
+    border: 1px solid #AAAAAA;
+    min-height: 20px;
+}
+QSpinBox::down-button {
+    background-color: #E9E9E9;
+    border-bottom-right-radius: 9px;
+    max-height: 0px;
+    max-width: 0px;
+}
+QSpinBox::up-button {
+    background-color: #E9E9E9;
+    border-top-right-radius: 9px;
+    max-height: 0px;
+    max-width: 0px;
+}

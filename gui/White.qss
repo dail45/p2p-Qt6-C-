@@ -1,0 +1,75 @@
+QWidget {
+    background-color: #FFFFFF;
+    color: #444444;
+    border-color: #444444;
+    border-radius: 20px;
+}
+::tab {
+    background: rgb(205, 205, 205);
+    color: black;
+    min-height: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+::tab:selected {
+    background-color: rgb(255, 255, 255);
+    color: #444444;
+}
+QScrollBar:vertical {
+    border: none;
+    background: #FFFFFF;
+    width: 0px;
+    margin: 15px 0px 15px 0px;
+    border-radius: 0px;
+}
+QScrollBar::handle:vertical {
+    min-height: 50px;
+    background-color: #F5F5F5;
+    border-radius: 4px;
+}
+QScrollBar::add-line:vertical {
+    height: 0px;
+}
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+QTabWidget::pane {
+    border: 0px;
+}
+QTabWidget::tab-bar {
+    color: red;
+    background-color: red;
+}
+QPushButton {
+    background-color: #AAAAAA;
+    color: #000000;
+    min-height: 24px;
+    border-radius: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-color: #444444;
+}
+QPushButton::hover {
+    background-color: #CCCCCC;
+    border: 1px solid #444444;
+}
+QPushButton::disabled {
+    color: #505050;
+}
+QPushButton::pressed {
+    background-color: #DCDCDC;
+}
+QLineEdit {
+    border: 1px solid #AAAAAA;
+}
+QTextEdit {
+    border: 1px solid #AAAAAA;
+}
+QComboBox {
+    border: 1px solid #AAAAAA;
+}
