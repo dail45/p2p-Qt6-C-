@@ -27,11 +27,6 @@ Tunnel::Tunnel(QObject *parent, QString type)
     this->totallength = 0;
     this->files = 0;
 
-    // DELETE LATER
-    QFile file(this->filename);
-    this->totallength = file.size();
-    //
-
     //this->paths;
     //this->filenames;
     //this->totallengths;
@@ -116,6 +111,36 @@ void Tunnel::sendinfoHandler(qint16 code) {
     emit this->sendinfoSignal(code);
 }
 
+void Tunnel::setFiles(QStringList files) {
+    if (files.length() == 0)
+        return;
+    if (files.length() == 1) {
+        this->multifile = false;
+        this->files = 1;
+        QString fullFileName = files[0];
+        this->filename = fullFileName.split("/").last();
+        QFile *file = new QFile(this->filename);
+        this->totallength = file->size();
+        file->deleteLater();
+        QStringList tempFilePath = fullFileName.split("/");
+        tempFilePath.removeLast();
+        this->path = tempFilePath.join("/");
+    } else {
+        this->multifile = true;
+        this->files = files.length();
+        for (qint64 i = 0; i < files.length(); i++) {
+            QString fullFileName = files[i];
+            this->filenames->append(fullFileName.split("/").last());
+            QFile *file = new QFile(this->filename);
+            this->totallengths->append(file->size());
+            file->deleteLater();
+            QStringList tempFilePath = fullFileName.split("/");
+            tempFilePath.removeLast();
+            this->paths->append(tempFilePath.join("/"));
+        }
+    }
+}
+
 
 QString Tunnel::infoToString() {
     QString res("");
@@ -171,6 +196,7 @@ void Tunnel::renderSpeed(bool criticalFlag) {
             (*this->lastsize)[i] = bytes;
         }
         qint8 progress = (qint8)floor((double)(bytes / (tl)) * 100);
+        (*this->progress)[i] = progress;
         qDebug() << "Progress (" << QString::number(i) << "):"  << QString::number(progress);
         quint64 delta = bytes - (*this->lastsize)[i];
         (*this->lastsize)[i] = bytes;
@@ -195,6 +221,7 @@ void Tunnel::renderSpeed(bool criticalFlag) {
             return;
     }
     this->renderSpeedTimer.stop();
+    emit this->operationdone();
     qDebug() << "finished rendering";
 }
 

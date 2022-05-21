@@ -71,13 +71,14 @@ public:
     QMap<quint64, quint64> *bytesdownloaded = new QMap<quint64, quint64>;
     QMap<quint64, quint64> *written = new QMap<quint64, quint64>;
 
+    QMap<quint64, qint8> *progress = new QMap<quint64, qint8>;
     QMap<quint64, quint64> *speed = new QMap<quint64, quint64>;
     QMap<quint64, quint64> *lastsize = new QMap<quint64, quint64>;
     QMap<quint64, QList<quint64>> *speedlist = new QMap<quint64, QList<quint64>>;
 
     quint8 status;
-    quint16 rnum;
-    quint16 dnum;
+    qint16 rnum;
+    qint16 dnum;
     QString token;
     quint64 files;
 
@@ -102,6 +103,7 @@ public:
     //sendInfo
     QNetworkAccessManager *sendinfomanager;
     void sendinfo();
+    void setFiles(QStringList files);
     void sendinfoHandler(qint16 code);
     TunnelWorker sendinfoworker;
     QThread sendinfothread;
@@ -130,6 +132,7 @@ signals:
     void registrationSignal(qint16);
     void sendinfoSignal(qint16);
     void renderingdone();
+    void operationdone();
     void errorhandlersignal(qint64);
 
 };

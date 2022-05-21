@@ -13,12 +13,31 @@ class UploadFileWidget: public QWidget
 public:
     UploadFileWidget(QWidget *parent=nullptr);
     ~UploadFileWidget();
+    struct FormatedSize {
+        quint64 unformated = 0;
+        qreal formated = 0;
+        QString value = "B";
+        qint8 intValue = 0;
+    };
+    FormatedSize totalLength;
+    QString path;
+    QString filename;
+    bool filled = false;
+    FormatedSize formatSize(quint64 unformatSize);
+
+    void selectFiles();
+    void setFile(QString filename);
+    void switchInterfaceChangeability(bool status);
+
+    void setProgress(qint8 progress);
+    void setSpeed(quint64 speed);
+    void setBytesProgress(quint64 bytesProgress);
 
 private:
     Ui::UploadFileWidget *ui;
 
 signals:
-
+    void selectedFileNames(QStringList filenames);
 
 };
 
