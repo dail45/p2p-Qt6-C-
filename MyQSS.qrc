@@ -4,5 +4,15 @@
         <file>gui/FloatingBlack.qss</file>
         <file>gui/FloatingWhite.qss</file>
         <file>gui/White.qss</file>
+        <file>gui/Icons/P2P.png</file>
+        <file>gui/Icons/play.png</file>
+        <file>gui/Icons/QR_black.png</file>
+        <file>gui/Icons/QR_white.png</file>
+        <file>gui/Icons/restart.png</file>
+        <file>gui/Icons/stop.png</file>
+        <file>gui/Icons/Trash_black.png</file>
+        <file>gui/Icons/Trash_white.png</file>
+        <file>gui/Icons/Up_black.png</file>
+        <file>gui/Icons/Up_white.png</file>
     </qresource>
 </RCC>

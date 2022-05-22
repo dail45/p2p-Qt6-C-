@@ -5,6 +5,8 @@
 #include <QThread>
 #include "tunnel.h"
 #include "uploadfilewidget.h"
+#include "settings_struct.h"
+#include <QGraphicsDropShadowEffect>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class UploadWidget; }
@@ -29,6 +31,9 @@ public:
     void errorHandler(qint64 statusCode);
     void render();
     void switchInterfaceChangeability(bool status);
+    void updateColorTheme(SettingsStruct settings);
+    void settingsHandler(SettingsStruct settings);
+    QGraphicsDropShadowEffect shadowEffect;
     QList<QWidget *> *UploadFileWidgetsList = new QList<QWidget *>;
 
 private:

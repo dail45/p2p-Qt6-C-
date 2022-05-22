@@ -11,18 +11,27 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    clientversionwidget.cpp \
     main.cpp \
     mainwindow.cpp \
+    requestparamssettingswidget.cpp \
+    serversettingswidget.cpp \
     tunnel.cpp \
     tunnelworker.cpp \
+    uisettingswidget.cpp \
     uploadfilewidget.cpp \
     uploadwidget.cpp \
     widget.cpp
 
 HEADERS += \
+    clientversionwidget.h \
     mainwindow.h \
+    requestparamssettingswidget.h \
+    serversettingswidget.h \
+    settings_struct.h \
     tunnel.h \
     tunnelworker.h \
+    uisettingswidget.h \
     uploadfilewidget.h \
     uploadwidget.h \
     widget.h
@@ -37,7 +46,7 @@ FORMS += \
     ui6/MainWindow.ui \
     ui6/MainWindowPyQt5Edition.ui \
     ui6/RequestParamsSettingsWidget.ui \
-    ui6/ServerSettingWidget.ui \
+    ui6/ServerSettingsWidget.ui \
     ui6/UiSettingsWidget.ui \
     ui6/UploadFileWidget.ui \
     ui6/UploadWidget.ui \
@@ -67,7 +76,7 @@ DISTFILES += \
     ui6/MainWindowPyQt5Edition.py \
     ui6/P2Ptunnel Логика Работы.png \
     ui6/RequestParamsSettingsWidget.py \
-    ui6/ServerSettingWidget.py \
+    ui6/ServerSettingsWidget.py \
     ui6/UiSettingsWidget.py \
     ui6/UploadFileWidget.py \
     ui6/UploadWidget.py \

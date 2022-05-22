@@ -166,3 +166,25 @@ void UploadWidget::errorHandler(qint64 state) {
         this->setStatusBarText("Application Error");
     }
 }
+
+void UploadWidget::updateColorTheme(SettingsStruct settings) {
+    this->setStyleSheet(settings.ui_colortheme_index == 0 ? settings.QSS->value("FloatingWhite") : settings.ui_colortheme_index == 1 ? settings.QSS->value("FloatingBlack") : "");
+    this->shadowEffect.setOffset(QPoint(8, 11));
+    this->shadowEffect.setBlurRadius(12);
+    this->shadowEffect.setColor(settings.ui_colortheme_index == 0 ? QColor(200, 200, 200) : settings.ui_colortheme_index == 1 ? QColor(20, 20, 20) : QColor(0, 0, 0));
+    this->setGraphicsEffect(&this->shadowEffect);
+    this->ui->QRBtn->setIcon(QIcon(settings.ui_colortheme_index == 0 ? ":/gui/Icons/QR_black.png" : settings.ui_colortheme_index == 1 ? ":/gui/Icons/QR_white.png" : ""));
+    this->ui->DelBtn->setIcon(QIcon(settings.ui_colortheme_index == 0 ? ":/gui/Icons/Trash_black.png" : settings.ui_colortheme_index == 1 ? ":/gui/Icons/Trash_white.png" : ""));
+}
+
+void UploadWidget::settingsHandler(SettingsStruct settings) {
+    if (this->state == 0 or (this->state == 2 && this->tunnel->rnum == -1)) {
+        this->tunnel->server = settings.server;
+        this->ui->serverLabel->setText(settings.server);
+    }
+    if (this->state < 3) {
+        this->tunnel->RAM = settings.request_RAM;
+        this->tunnel->threads = settings.request_threads;
+        this->tunnel->chunksize = settings.request_chunksize;
+    }
+}
