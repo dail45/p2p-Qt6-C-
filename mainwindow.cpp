@@ -43,12 +43,11 @@ MainWindow::MainWindow(QWidget *parent)
     QSpacerItem *spacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ui->SettingsLayout->addItem(spacer);
 
+    this->settingsInit();
     QObject::connect(ui->AddUploadBtn, &QPushButton::clicked, this, [=](){this->createUploadWidget();});
     QObject::connect(this->ssw, &ServerSettingsWidget::settingsChanged, this, &MainWindow::settingsHandler);
     QObject::connect(this->rpsw, &RequestParamsSettingsWidget::settingsChanged, this, &MainWindow::settingsHandler);
-    QObject::connect(this->uisw, &UiSettingsWidget::settingsChanged, this, &MainWindow::settingsHandler);
-
-    this->settingsInit();
+    QObject::connect(this->uisw, &UiSettingsWidget::settingsChanged, this, &MainWindow::settingsHandler);    
 }
 
 void MainWindow::settingsInit() {
@@ -56,6 +55,7 @@ void MainWindow::settingsInit() {
     quint64 MB = 1024 * KB;
     this->settings = new QSettings(this->COMPANY_NAME, this->INTERNAL_APPLICATION_NAME);
     this->appsettings.server_index = this->settings->value("settings/settingsTab/server_index", QVariant(0)).toInt();
+    this->appsettings.localhost_server_port = this->settings->value("settings/settingsTab/localhost_server_port", QVariant(8001)).toInt();
 
     this->appsettings.another_server_ip = this->settings->value("settings/settingsTab/another_server_ip", QVariant("")).toString();
     this->appsettings.another_server_port = this->settings->value("settings/settingsTab/another_server_port", QVariant(8001)).toInt();
@@ -67,7 +67,13 @@ void MainWindow::settingsInit() {
     this->appsettings.ui_colortheme_index = this->settings->value("settings/settingsTab/ui_colortheme_index", QVariant(0)).toInt();
 
     this->appsettings.QSS = this->StyleSheet;
+
     this->settingsColorThemeSet();
+    this->ssw->setSettings(this->appsettings);
+    this->rpsw->setSettings(this->appsettings);
+    this->uisw->setSettings(this->appsettings);
+
+    this->appsettings.server = this->ssw->getServer();
 }
 
 void MainWindow::settingsSave() {
@@ -78,7 +84,9 @@ void MainWindow::settingsSave() {
     this->appsettings.server = this->ssw->getServer();
 
     this->appsettings.server_index = sswS["server_index"].toInt();
+    this->appsettings.localhost_server_port = sswS["localhost_server_port"].toInt();
     this->settings->setValue("settings/settingsTab/server_index", QVariant(this->appsettings.server_index));
+    this->settings->setValue("settings/settingsTab/localhost_server_port", QVariant(this->appsettings.localhost_server_port));
 
     this->appsettings.another_server_ip = sswS["another_server_ip"].toString();
     this->appsettings.another_server_port = sswS["another_server_port"].toInt();
@@ -99,22 +107,19 @@ void MainWindow::settingsSave() {
 
 void MainWindow::settingsColorThemeSet() {
     QString QSS;
-    QString FloatingQSS;
     switch(this->appsettings.ui_colortheme_index) {
     case 0:
         QSS = this->appsettings.QSS->value("White");
-        FloatingQSS = this->appsettings.QSS->value("FloatingWhite");
         break;
     case 1:
         QSS = this->appsettings.QSS->value("Black");
-        FloatingQSS = this->appsettings.QSS->value("FloatingBlack");
         break;
     }
     this->setStyleSheet(QSS);
-    this->ssw->setStyleSheet(FloatingQSS);
-    this->rpsw->setStyleSheet(FloatingQSS);
-    this->uisw->setStyleSheet(FloatingQSS);
-    this->cvw->setStyleSheet(FloatingQSS);  // todo: remove Unknown property text
+    this->ssw->updateColorTheme(this->appsettings);
+    this->rpsw->updateColorTheme(this->appsettings);
+    this->uisw->updateColorTheme(this->appsettings);
+    this->cvw->updateColorTheme(this->appsettings);
     for (quint64 i = 0; i < (quint64)this->UploadWidgetsList->length(); i++) {
         ((UploadWidget*)(*this->UploadWidgetsList)[i])->updateColorTheme(this->appsettings);
     }

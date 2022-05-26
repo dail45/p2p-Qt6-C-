@@ -34,7 +34,7 @@ private:
     QString COMPANY_DOMAIN = "dail45.ru";
     QString APPLICATION_NAME = "p2p";
     QString INTERNAL_APPLICATION_NAME = "p2p (C++)";
-    QString APPLICATION_VERSION = "0.3";
+    QString APPLICATION_VERSION = "0.4";
     SettingsStruct appsettings;
     QSettings *settings;
     Ui::MainWindow *ui;

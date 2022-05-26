@@ -1,6 +1,9 @@
 QT       += core gui
+QT += qml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+
 
 QT += network
 
@@ -61,6 +64,8 @@ CONFIG += embed_translations
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+android: include(D:/Programming/androidSDK/android_openssl/openssl.pri)
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
 RESOURCES += \
     MyQSS.qrc
@@ -81,3 +86,7 @@ DISTFILES += \
     ui6/UploadFileWidget.py \
     ui6/UploadWidget.py \
     ui6/uigenpy.py
+
+OTHER_FILES += \
+    android/AndroidManifest.xml \
+    android/src/org/dail45/p2p/MyJNI.java

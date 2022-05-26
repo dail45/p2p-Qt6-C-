@@ -3,6 +3,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFile>
+#include <QCoreApplication>
+
+#ifdef Q_OS_ANDROID
+#include <QJniObject>
+#endif
 
 TunnelWorker::TunnelWorker(QObject *parent, quint64 id)
     : QObject{parent}
@@ -67,30 +72,92 @@ void TunnelWorker::errorHandler(qint64 statusCode) {
 }
 
 void TunnelWorker::readfiles() {
+    qDebug() << "TW: readfiles";
     this->running = true;
     if (!this->readparams.multifile){
-    QFile file(this->readparams.path + "/" + this->readparams.filename);
-    file.open(QFile::ReadOnly);
-    quint64 findex = 0;
-    quint64 index = 0;
-    while (this->running) {
-        this->readermutex.lock();
-        if (this->readparams.chunksize > this->readparams.freememory)
-            this->waitreader.wait(&this->readermutex);
-        QByteArray chunk = file.read(this->readparams.chunksize);
-        if (chunk.length() == 0) {
-            this->running = false;
+        #ifdef Q_OS_ANDROID
+        auto activity = QJniObject(QNativeInterface::QAndroidApplication::context());
+        QJniObject MyJni = QJniObject("org/dail45/p2p/MyJNI",
+                                      "(Landroid/app/Activity;)V",
+                                      activity.object<jobject>());
+        jint fd = MyJni.callMethod<jint>("getFdFromString", "(Ljava/lang/String;)I", QJniObject::fromString(this->readparams.path).object<jobject>());
+        QFile file;
+        file.open(fd, QFile::ReadOnly);
+        #else
+        QFile file(this->readparams.path + "/" + this->readparams.filename);
+        file.open(QFile::ReadOnly);
+        #endif
+        quint64 findex = 0;
+        quint64 index = 0;
+        while (this->running) {
+            this->readermutex.lock();
+            if (this->readparams.chunksize > this->readparams.freememory)
+                this->waitreader.wait(&this->readermutex);
+            qDebug() << "reading:" << findex << index << "...";
+            QByteArray chunk = file.read(this->readparams.chunksize);
+            qDebug() << "reading done.";
+            if (chunk.length() == 0) {
+                this->running = false;
+                this->readermutex.unlock();
+                break;
+            }
+            this->readparams.freememory -= this->readparams.chunksize;
+            emit this->outChunkSignal(findex, index, chunk);
+            ++index;
             this->readermutex.unlock();
-            break;
         }
-        this->readparams.freememory -= this->readparams.chunksize;
-        emit this->outChunkSignal(findex, index, chunk);
-        ++index;
-        this->readermutex.unlock();
-    }} else {
-    while (this->running) {
-
-    }
+        file.close();
+        file.deleteLater();
+    } else {
+        #ifdef Q_OS_ANDROID
+        auto activity = QJniObject(QNativeInterface::QAndroidApplication::context());
+        QJniObject MyJni = QJniObject("org/dail45/p2p/MyJNI",
+                                      "(Landroid/app/Activity;)V",
+                                      activity.object<jobject>());
+        jint fd = MyJni.callMethod<jint>("getFdFromString", "(Ljava/lang/String;)I", QJniObject::fromString((*this->readparams.paths)[0]).object<jobject>());
+        QFile file;
+        file.open(fd, QFile::ReadOnly);
+        #else
+        QFile file((*this->readparams.paths)[0] + "/" + (*this->readparams.filenames)[0]);
+        file.open(QFile::ReadOnly);
+        #endif
+        quint64 findex = 0;
+        quint64 index = 0;
+        bool fileIsEnd = false;
+        while (this->running) {
+            this->readermutex.lock();
+            if (this->readparams.chunksize > this->readparams.freememory)
+                this->waitreader.wait(&this->readermutex);
+            if (fileIsEnd) {
+                file.close();
+                ++findex;
+                index = 0;
+                fileIsEnd = false;
+                if (findex < this->readparams.files) {
+                    #ifdef Q_OS_ANDROID
+                    jint fd = MyJni.callMethod<jint>("getFdFromString", "(Ljava/lang/String;)I", QJniObject::fromString((*this->readparams.paths)[findex]).object<jobject>());
+                    QFile file;
+                    file.open(fd, QFile::ReadOnly);
+                    #else
+                    QFile file((*this->readparams.paths)[findex] + "/" + (*this->readparams.filenames)[findex]);
+                    file.open(QFile::ReadOnly);
+                    #endif
+                } else {
+                    // exit
+                }
+            } else {
+                qDebug() << "reading ... (" << QString::number(findex) << QString::number(index) << ")";
+                QByteArray chunk = file.read(this->readparams.chunksize);
+                if (chunk.length() != 0) {
+                    this->readparams.freememory -= this->readparams.chunksize;
+                    emit this->outChunkSignal(findex, index, chunk);
+                    ++index;
+                    this->readermutex.unlock();
+                } else {
+                    fileIsEnd = true;
+                }
+            }
+        }
     }
     emit this->finished();
 }
@@ -157,8 +224,13 @@ void TunnelWorker::sendChunkReplyHandler(QNetworkReply *reply) {
 }
 
 void TunnelWorker::sendChunkProgressHandler(quint64 bytesSend, quint64 bytesTotal) {
-    qDebug() << "TW: sendChunkProgressHandler";
+    qDebug() << "TW: sendChunkProgressHandler" << QString::number(bytesSend) << QString::number(bytesTotal);
+    if (bytesSend == 0 && bytesTotal == 0) {
+        this->bytesLast = 0;
+        return;
+    }
     quint64 delta = bytesSend - this->bytesLast;
+    qDebug() << "delta: " << QString::number(delta);
     this->bytesLast = bytesSend;
     emit addUploadProgressSignal(delta, this->findex);
     if (bytesSend == bytesTotal) {

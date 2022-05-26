@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QVariant>
+#include <QGraphicsDropShadowEffect>
+#include "settings_struct.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class UiSettingsWidget; }
@@ -14,9 +16,11 @@ class UiSettingsWidget : public QWidget
 public:
     UiSettingsWidget(QWidget *parent = nullptr);
     ~UiSettingsWidget();
+    void setSettings(SettingsStruct settings);
     QMap<QString, QVariant> getSettings();
     Ui::UiSettingsWidget *ui;
-
+    QGraphicsDropShadowEffect shadowEffect;
+    void updateColorTheme(SettingsStruct settings);
 signals:
     void settingsChanged();
 };

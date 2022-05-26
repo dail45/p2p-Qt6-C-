@@ -6,6 +6,7 @@
 #include "tunnel.h"
 #include "uploadfilewidget.h"
 #include "settings_struct.h"
+#include <QQmlFile>
 #include <QGraphicsDropShadowEffect>
 
 QT_BEGIN_NAMESPACE

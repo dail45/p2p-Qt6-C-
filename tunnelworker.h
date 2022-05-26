@@ -17,6 +17,8 @@ struct TunnelWorkerReaderParams {
     QList<QString> *filenames;
     QList<quint64> *totallengths;
 
+    quint64 files;
+
     quint64 chunksize;
     quint64 freememory;
     bool multifile;
@@ -49,7 +51,7 @@ public:
     QByteArray hash;
     qint64 findex = -1;
     qint64 index = -1;
-    quint64 bytesLast;
+    quint64 bytesLast = 0;
 
 signals:
     void finished();

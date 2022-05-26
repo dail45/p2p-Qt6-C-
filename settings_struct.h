@@ -6,6 +6,7 @@
 struct SettingsStruct {
     QString server;
     quint8 server_index;
+    quint16 localhost_server_port = 8001;
 
     QString another_server_ip;
     quint16 another_server_port = 8001;

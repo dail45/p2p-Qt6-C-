@@ -35,6 +35,7 @@ class Tunnel : public QObject
     Q_OBJECT
 public:
     Tunnel(QObject *parent = nullptr, QString type="");
+    ~Tunnel();
     QObject *parent;
     QString type;
     void delay(quint64 ms);
@@ -46,13 +47,13 @@ public:
     qulonglong RAM;
     uint8_t threads;
 
-    QString path;
+    QString path; // Platforms: Path ; Android: Uri ;
     QString filename;
     qulonglong totallength;
 
     qint64 state = 0;
 
-    QList<QString> *paths = new QList<QString>;
+    QList<QString> *paths = new QList<QString>; // Platforms: Path ; Android: Uri ;
     QList<QString> *filenames = new QList<QString>;
     QList<quint64> *totallengths = new QList<quint64>;
 

@@ -2,6 +2,7 @@
 #include "ui_UploadWidget.h"
 #include <QPushButton>
 #include <QDebug>
+#include <QQmlEngine>
 
 UploadWidget::UploadWidget(QWidget *parent)
     : QWidget{parent}, ui(new Ui::UploadWidget)
@@ -60,12 +61,15 @@ void UploadWidget::selectedFileNamesHandler(QStringList files) {
     }
     this->state = 2;
     if (files.length() > 1) {
+        this->ui->UploadFileWidgetsLayout->removeWidget((UploadFileWidget*)this->sender());
+        this->UploadFileWidgetsList->remove(this->UploadFileWidgetsList->indexOf((UploadFileWidget*)this->sender()));
         ((UploadFileWidget*)this->sender())->deleteLater();
         ((UploadFileWidget*)this->sender())->hide();
         for (qint64 i=0; i < files.length(); i++) {
             this->addUploadFileWidget();
             ((UploadFileWidget*)this->UploadFileWidgetsList->last())->setFile(files[i]);
         }
+        this->addUploadFileWidget();
     } else {
         if (!((UploadFileWidget*)this->sender())->filled)
             this->addUploadFileWidget();
@@ -149,7 +153,6 @@ void UploadWidget::sendinfoHandler(qint16 state) {
 
 void UploadWidget::uploadDoneHandler() {
     this->ui->StatusBar->setText("Uploading Done");
-    delete this->tunnel;
 }
 
 void UploadWidget::errorHandler(qint64 state) {

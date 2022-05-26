@@ -2,6 +2,8 @@
 #define CLIENTVERSIONWIDGET_H
 
 #include <QWidget>
+#include <QGraphicsDropShadowEffect>
+#include "settings_struct.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ClientVersionWidget; }
@@ -15,7 +17,8 @@ public:
     ~ClientVersionWidget();
     void setVersion(QString version);
     Ui::ClientVersionWidget *ui;
-
+    QGraphicsDropShadowEffect shadowEffect;
+    void updateColorTheme(SettingsStruct settings);
 signals:
 
 };

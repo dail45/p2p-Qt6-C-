@@ -2,6 +2,11 @@
 #include "ui_UploadFileWidget.h"
 #include <QFileDialog>
 #include <QStringList>
+#include <QFileInfo>
+
+#ifdef Q_OS_ANDROID
+#include <QJniObject>
+#endif
 
 UploadFileWidget::UploadFileWidget(QWidget *parent)
     : QWidget{parent}, ui(new Ui::UploadFileWidget)
@@ -44,20 +49,42 @@ UploadFileWidget::FormatedSize UploadFileWidget::formatSize(quint64 unformatSize
 
 void UploadFileWidget::setFile(QString filename) {
     qDebug() << "UFW: setFile";
+    #ifdef Q_OS_ANDROID
+    qDebug("================================================================================================");
+
+    auto activity = QJniObject(QNativeInterface::QAndroidApplication::context());
+    QJniObject MyJni = QJniObject("org/dail45/p2p/MyJNI",
+                                  "(Landroid/app/Activity;)V",
+                                  activity.object<jobject>());
+    jint fd = MyJni.callMethod<jint>("getFdFromString", "(Ljava/lang/String;)I", QJniObject::fromString(filename).object<jobject>());
+    QJniObject fname = MyJni.callObjectMethod("getFileNameFromString", "(Ljava/lang/String;)Ljava/lang/String;", QJniObject::fromString(filename).object<jobject>());
+    QFile *file = new QFile();
+    file->open(fd, QFile::ReadOnly);
+    quint64 size = file->size();
+    file->deleteLater();
+    this->filename = fname.toString();
+    this->path = filename;
+    QString path = "content:/";
+
+    qDebug("================================================================================================");
+    //QJniObject contentResolver = QtAndroid::androidActivity().callObjectMethod("getContentResolver", "()Landroid/content/ContentResolver;");
+    #else
     QFile *file = new QFile(filename);
     quint64 size = file->size();
+    this->filename = filename.split("/").last();
+    this->path = filename;
+    QStringList tpath = filename.split("/");
+    tpath.removeLast();
+    QString path = tpath.join("/");
+    #endif
+
     FormatedSize fsize = this->formatSize(size);
     this->totalLength = fsize;
-    this->path = filename;
-    this->filename = filename.split("/").last();
 
     QString ssize = "";
     ssize += "0 B /" + QString::number(fsize.formated, 'f', 2) + " " + fsize.value;
     ui->sizeLabel->setText(ssize);
 
-    QStringList tpath = filename.split("/");
-    tpath.removeLast();
-    QString path = tpath.join("/");
     ui->pathLabel->setText(path);
     ui->pathLabel->setWordWrap(true);
 
@@ -85,8 +112,6 @@ void UploadFileWidget::selectFiles() {
     QFileDialog *dialog = new QFileDialog(this);
     QStringList files = dialog->getOpenFileNames();
     dialog->deleteLater();
-    //this->deleteLater();
-    //this->hide();
     emit this->selectedFileNames(files);
 }
 

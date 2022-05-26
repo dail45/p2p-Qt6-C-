@@ -6,12 +6,17 @@
 #include <QList>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QFile>
 #include <QDataStream>
 #include <QTime>
 #include <QCoreApplication>
 #include <QEventLoop>
 #include "delay.h"
+
+#ifdef Q_OS_ANDROID
+#include <QJniObject>
+#endif
 
 Tunnel::Tunnel(QObject *parent, QString type)
     : QObject{parent}
@@ -75,6 +80,18 @@ Tunnel::Tunnel(QObject *parent, QString type)
     QObject::connect(&this->renderSpeedTimer, &QTimer::timeout, this, [this]() {this->renderSpeed(false);});
 }
 
+Tunnel::~Tunnel() {
+//    if (this->readerthread.isRunning())
+//        this->regthread.terminate();
+//    if (this->sendinfothread.isRunning())
+//        this->sendinfothread.terminate();
+//    for (int i = 0; i < this->threads; i++) {
+//        QThread *th = this->Threads->value(i);
+//        if (th->isRunning())
+//            th->terminate();
+//    }
+}
+
 void Tunnel::delay(quint64 ms)
 {
     QTime dieTime= QTime::currentTime().addMSecs(ms);
@@ -118,6 +135,21 @@ void Tunnel::setFiles(QStringList files) {
         this->multifile = false;
         this->files = 1;
         QString fullFileName = files[0];
+#ifdef Q_OS_ANDROID
+        auto activity = QJniObject(QNativeInterface::QAndroidApplication::context());
+        QJniObject MyJni = QJniObject("org/dail45/p2p/MyJNI",
+                                      "(Landroid/app/Activity;)V",
+                                      activity.object<jobject>());
+        jint fd = MyJni.callMethod<jint>("getFdFromString", "(Ljava/lang/String;)I", QJniObject::fromString(fullFileName).object<jobject>());
+        QJniObject fname = MyJni.callObjectMethod("getFileNameFromString", "(Ljava/lang/String;)Ljava/lang/String;", QJniObject::fromString(fullFileName).object<jobject>());
+        QFile *file = new QFile();
+        file->open(fd, QFile::ReadOnly);
+
+        this->filename = fname.toString();
+        this->totallength = file->size();
+        this->path = fullFileName;
+        file->deleteLater();
+#else
         this->filename = fullFileName.split("/").last();
         QFile *file = new QFile(this->filename);
         this->totallength = file->size();
@@ -125,11 +157,29 @@ void Tunnel::setFiles(QStringList files) {
         QStringList tempFilePath = fullFileName.split("/");
         tempFilePath.removeLast();
         this->path = tempFilePath.join("/");
+#endif
     } else {
         this->multifile = true;
         this->files = files.length();
+#ifdef Q_OS_ANDROID
+        auto activity = QJniObject(QNativeInterface::QAndroidApplication::context());
+        QJniObject MyJni = QJniObject("org/dail45/p2p/MyJNI",
+                                      "(Landroid/app/Activity;)V",
+                                      activity.object<jobject>());
+#endif
         for (qint64 i = 0; i < files.length(); i++) {
             QString fullFileName = files[i];
+#ifdef Q_OS_ANDROID
+            jint fd = MyJni.callMethod<jint>("getFdFromString", "(Ljava/lang/String;)I", QJniObject::fromString(fullFileName).object<jobject>());
+            QJniObject fname = MyJni.callObjectMethod("getFileNameFromString", "(Ljava/lang/String;)Ljava/lang/String;", QJniObject::fromString(fullFileName).object<jobject>());
+            QFile *file = new QFile();
+            file->open(fd, QFile::ReadOnly);
+            this->filenames->append(fname.toString());
+            this->totallengths->append(file->size());
+            file->deleteLater();
+            this->paths->append(fullFileName);
+#else
+
             this->filenames->append(fullFileName.split("/").last());
             QFile *file = new QFile(this->filename);
             this->totallengths->append(file->size());
@@ -137,6 +187,7 @@ void Tunnel::setFiles(QStringList files) {
             QStringList tempFilePath = fullFileName.split("/");
             tempFilePath.removeLast();
             this->paths->append(tempFilePath.join("/"));
+#endif
         }
     }
 }
@@ -149,12 +200,31 @@ QString Tunnel::infoToString() {
     res += "&RAM=" + QString::number(this->RAM);
     res += "&multifile=" + QString::number(this->multifile);
     if (this->multifile) {
+        QString filenames;
+        filenames += "[";
+        for (quint64 i = 0; i < (quint64)this->filenames->length(); i++) {
+            filenames += "\"";
+            QString filename(this->filenames->value(i));
+            filenames += filename;
+            if (i != (quint64)this->filenames->length() - 1)
+                filenames += "\",";
+        }
+        filenames += "\"]";
 
+        QString totallengths;
+        totallengths += "[";
+        for (quint64 i = 0; i < (quint64)this->totallengths->length(); i++) {
+            QString totallength(QString::number(this->totallengths->value(i)));
+            totallengths += totallength;
+        }
+        totallengths += "]";
+        res += "&filenames=" + filenames;
+        res += "&totallengths=" + totallengths;
     } else {
         res += "&filename=" + this->filename;
         res += "&totallength=" + QString::number(this->totallength);
     }
-    return res; // ToDo
+    return res; // ToDo : add Zip params
 }
 
 void Tunnel::chunkHandler(qint64 findex, qint64 index, QByteArray chunk) {
@@ -197,7 +267,7 @@ void Tunnel::renderSpeed(bool criticalFlag) {
         }
         qint8 progress = (qint8)floor((double)(bytes / (tl)) * 100);
         (*this->progress)[i] = progress;
-        qDebug() << "Progress (" << QString::number(i) << "):"  << QString::number(progress);
+        // qDebug() << "Progress (" << QString::number(i) << "):"  << QString::number(progress);
         quint64 delta = bytes - (*this->lastsize)[i];
         (*this->lastsize)[i] = bytes;
         quint64 speed = delta / 0.25;
@@ -209,7 +279,7 @@ void Tunnel::renderSpeed(bool criticalFlag) {
             rspeed += (*this->speedlist)[i].value(j);
         rspeed /= (*this->speedlist)[i].length();
         (*this->speed)[i] = (quint64)rspeed;
-        qDebug() << "Speed (" << QString::number(i) << "):"  << QString::number((quint64)rspeed) << "B/s";
+        // qDebug() << "Speed (" << QString::number(i) << "):"  << QString::number((quint64)rspeed) << "B/s";
         if (bytes == tl)
             res.append(true);
         else
@@ -235,7 +305,13 @@ void Tunnel::start() {
             this->readerworker.readparams.freememory = this->RAM;
             this->readerworker.readparams.multifile = false;
         } else {
-
+            this->readerworker.readparams.filenames = this->filenames;
+            this->readerworker.readparams.paths = this->paths;
+            this->readerworker.readparams.totallengths = this->totallengths;
+            this->readerworker.readparams.chunksize = this->chunksize;
+            this->readerworker.readparams.freememory = this->RAM;
+            this->readerworker.readparams.multifile = true;
+            this->readerworker.readparams.files = this->files;
         }
         this->readerthread.start();
         this->renderSpeedTimer.start(250);
@@ -326,6 +402,7 @@ void Tunnel::removeChunk(qint64 findex, qint64 index) {
     }
     (*this->storage)[findex].remove(index);
     this->readerworker.readparams.freememory += this->chunksize;
+    this->readerworker.waitreader.wakeAll();
 }
 
 void Tunnel::sendChunk(qint64 findex, qint64 index, QByteArray chunk, QString hash) {
