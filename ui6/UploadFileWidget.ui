@@ -79,20 +79,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="sizeLabel">
-          <property name="text">
-           <string>0/0 KB</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="speedLabel">
-          <property name="text">
-           <string>0 KB/s</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="startSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -111,6 +97,83 @@
            <string>del</string>
           </property>
          </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="timeLabel">
+          <property name="text">
+           <string>eta. 00:00:00</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="sizeLabel">
+          <property name="text">
+           <string>0/0 KB</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="speedLabel">
+          <property name="text">
+           <string>0 KB/s</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>

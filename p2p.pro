@@ -15,6 +15,7 @@ CONFIG += c++17
 
 SOURCES += \
     clientversionwidget.cpp \
+    crc32hasher.cpp \
     main.cpp \
     mainwindow.cpp \
     requestparamssettingswidget.cpp \
@@ -28,6 +29,7 @@ SOURCES += \
 
 HEADERS += \
     clientversionwidget.h \
+    crc32hasher.h \
     mainwindow.h \
     requestparamssettingswidget.h \
     serversettingswidget.h \

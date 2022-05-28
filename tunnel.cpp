@@ -76,7 +76,7 @@ Tunnel::Tunnel(QObject *parent, QString type)
     QObject::connect(&this->readerthread, &QThread::started, &this->readerworker, &TunnelWorker::readfiles);
     QObject::connect(&this->readerworker, &TunnelWorker::outChunkSignal, this, &Tunnel::chunkHandler);
 
-    QObject::connect(&this->readerworker, &TunnelWorker::finished, this, [this]() {qDebug() << "finished";this->readerthread.quit();});
+    QObject::connect(&this->readerworker, &TunnelWorker::finished, &this->readerthread, &QThread::quit);
     QObject::connect(&this->renderSpeedTimer, &QTimer::timeout, this, [this]() {this->renderSpeed(false);});
 }
 
@@ -113,6 +113,7 @@ void Tunnel::registrationHandler(qint16 rnum, qint16 code) {
         this->setRnum(rnum);
         this->state = 1;
     }
+    this->regthread.quit();
     emit this->registrationSignal(code);
 }
 
@@ -125,6 +126,7 @@ void Tunnel::sendinfo() {
 void Tunnel::sendinfoHandler(qint16 code) {
     if ((int)code == 1)
         this->state = 2;
+    this->sendinfothread.quit();
     emit this->sendinfoSignal(code);
 }
 

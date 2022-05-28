@@ -8,6 +8,27 @@
 MainWindow::MainWindow(QWidget *parent)
     : QWidget{parent}, ui(new Ui::MainWindow)
 {
+#ifdef Q_OS_ANDROID
+    QFile White(":/gui/WhiteAndroid.qss");
+    White.open(QFile::ReadOnly);
+    this->StyleSheet->insert("White", White.readAll());
+    White.close();
+
+    QFile FloatingWhite(":/gui/FloatingWhiteAndroid.qss");
+    FloatingWhite.open(QFile::ReadOnly);
+    this->StyleSheet->insert("FloatingWhite", FloatingWhite.readAll());
+    FloatingWhite.close();
+
+    QFile Black(":/gui/BlackAndroid.qss");
+    Black.open(QFile::ReadOnly);
+    this->StyleSheet->insert("Black", Black.readAll());
+    Black.close();
+
+    QFile FloatingBlack(":/gui/FloatingBlackAndroid.qss");
+    FloatingBlack.open(QFile::ReadOnly);
+    this->StyleSheet->insert("FloatingBlack", FloatingBlack.readAll());
+    FloatingBlack.close();
+#else
     QFile White(":/gui/White.qss");
     White.open(QFile::ReadOnly);
     this->StyleSheet->insert("White", White.readAll());
@@ -27,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
     FloatingBlack.open(QFile::ReadOnly);
     this->StyleSheet->insert("FloatingBlack", FloatingBlack.readAll());
     FloatingBlack.close();
-
+#endif
     ui->setupUi(this);
     this->setWindowIcon(QIcon(":/gui/Icons/P2P.png"));
     this->setWindowTitle(this->APPLICATION_NAME);

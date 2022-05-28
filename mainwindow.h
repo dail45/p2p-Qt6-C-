@@ -14,7 +14,6 @@
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
 class MainWindow : public QWidget
 {
     Q_OBJECT
@@ -34,7 +33,7 @@ private:
     QString COMPANY_DOMAIN = "dail45.ru";
     QString APPLICATION_NAME = "p2p";
     QString INTERNAL_APPLICATION_NAME = "p2p (C++)";
-    QString APPLICATION_VERSION = "0.4";
+    QString APPLICATION_VERSION = "0.5";
     SettingsStruct appsettings;
     QSettings *settings;
     Ui::MainWindow *ui;

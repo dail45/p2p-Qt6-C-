@@ -15,6 +15,7 @@ UploadFileWidget::UploadFileWidget(QWidget *parent)
     ui->delBtn->hide();
     ui->sizeLabel->hide();
     ui->pathLabel->hide();
+    ui->timeLabel->hide();
     ui->speedLabel->hide();
     ui->progressBar->hide();
     QObject::connect(ui->filenameBtn, &QPushButton::clicked, this, &UploadFileWidget::selectFiles);
@@ -95,6 +96,7 @@ void UploadFileWidget::setFile(QString filename) {
     ui->delBtn->show();
     ui->sizeLabel->show();
     ui->pathLabel->show();
+    ui->timeLabel->show();
     ui->speedLabel->show();
     ui->progressBar->show();
     ui->horizontalLayout->removeItem(ui->startSpacer);

@@ -14,5 +14,9 @@
         <file>gui/Icons/Trash_white.png</file>
         <file>gui/Icons/Up_black.png</file>
         <file>gui/Icons/Up_white.png</file>
+        <file>gui/BlackAndroid.qss</file>
+        <file>gui/FloatingBlackAndroid.qss</file>
+        <file>gui/FloatingWhiteAndroid.qss</file>
+        <file>gui/WhiteAndroid.qss</file>
     </qresource>
 </RCC>
